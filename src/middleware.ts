@@ -125,6 +125,9 @@ function shouldSkipAuth(pathname: string): boolean {
     '/icons/',
     '/logo.png',
     '/screenshot.png',
+    '/login',
+    '/warning',
+
   ];
 
   return skipPaths.some((path) => pathname.startsWith(path));
