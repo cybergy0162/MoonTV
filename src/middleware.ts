@@ -127,6 +127,14 @@ function shouldSkipAuth(pathname: string): boolean {
     '/screenshot.png',
     '/login',
     '/warning',
+    // Public auth & utility API routes must be reachable without a session.
+    // EdgeOne does not honor the `config.matcher` exclusions, so these are
+    // handled here explicitly to avoid 401/redirect loops.
+    '/api/login',
+    '/api/register',
+    '/api/logout',
+    '/api/cron',
+    '/api/server-config',
 
   ];
 
