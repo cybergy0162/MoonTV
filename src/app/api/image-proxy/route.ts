@@ -27,30 +27,18 @@ export async function GET(request: Request) {
       );
     }
 
-    const contentType = imageResponse.headers.get('content-type');
+    const contentType = imageResponse.headers.get('content-type') || 'image/jpeg';
 
-    if (!imageResponse.body) {
-      return NextResponse.json(
-        { error: 'Image response has no body' },
-        { status: 500 }
-      );
-    }
+    // 读取为 ArrayBuffer 再返回，避免 Netlify/Serverless 对 ReadableStream 处理异常
+    const buffer = await imageResponse.arrayBuffer();
 
-    // 创建响应头
-    const headers = new Headers();
-    if (contentType) {
-      headers.set('Content-Type', contentType);
-    }
-
-    // 设置缓存头（可选）
-    headers.set('Cache-Control', 'public, max-age=15720000, s-maxage=15720000'); // 缓存半年
-    headers.set('CDN-Cache-Control', 'public, s-maxage=15720000');
-    headers.set('Vercel-CDN-Cache-Control', 'public, s-maxage=15720000');
-
-    // 直接返回图片流
-    return new Response(imageResponse.body, {
+    return new NextResponse(buffer, {
       status: 200,
-      headers,
+      headers: {
+        'Content-Type': contentType,
+        'Cache-Control': 'public, max-age=15720000, s-maxage=15720000',
+        'CDN-Cache-Control': 'public, s-maxage=15720000',
+      },
     });
   } catch (error) {
     return NextResponse.json(
