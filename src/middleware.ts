@@ -135,8 +135,9 @@ function shouldSkipAuth(pathname: string): boolean {
     '/api/logout',
     '/api/cron',
     '/api/server-config',
-    // Cloud Function proxy routes (skip auth for these)
+    // Proxy routes (skip auth for these)
     '/douban-proxy',
+    '/api/image-proxy',
 
   ];
 
@@ -146,6 +147,6 @@ function shouldSkipAuth(pathname: string): boolean {
 // 配置middleware匹配规则
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|login|warning|api/login|api/register|api/logout|api/cron|api/server-config|douban-proxy).*)',
+    '/((?!_next/static|_next/image|favicon.ico|login|warning|api/login|api/register|api/logout|api/cron|api/server-config|douban-proxy|api/image-proxy).*)',
   ],
 };
