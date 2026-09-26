@@ -3,11 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "pnpm gen:runtime && pnpm gen:manifest && next dev -H 0.0.0.0",
-    "build": "pnpm gen:runtime && pnpm gen:manifest && next build",
+    "dev": "node scripts/convert-config.js && node scripts/generate-manifest.js && next dev -H 0.0.0.0",
+    "build": "node scripts/convert-config.js && node scripts/generate-manifest.js && next build",
     "start": "next start",
     "lint": "next lint",
-    "lint:fix": "eslint src --fix && pnpm format",
+    "lint:fix": "eslint src --fix && prettier -w .",
     "lint:strict": "eslint --max-warnings=0 src",
     "typecheck": "tsc --noEmit --incremental false",
     "test:watch": "jest --watch",
@@ -19,7 +19,7 @@
     "gen:version": "node scripts/generate-version.js",
     "postbuild": "echo 'Build completed - sitemap generation disabled'",
     "prepare": "husky install",
-    "pages:build": "pnpm gen:runtime && pnpm gen:manifest && next build && npx @cloudflare/next-on-pages --experimental-minify"
+    "pages:build": "node scripts/convert-config.js && node scripts/generate-manifest.js && next build && npx @cloudflare/next-on-pages --experimental-minify"
   },
   "dependencies": {
     "@cloudflare/next-on-pages": "^1.13.12",
@@ -59,11 +59,12 @@
     "@testing-library/react": "^15.0.7",
     "@types/node": "24.0.3",
     "@types/react": "^18.3.18",
-    "@types/react-dom": "^19.1.6",
+    "@types/react-dom": "^18.3.0",
     "@types/testing-library__jest-dom": "^5.14.9",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
     "autoprefixer": "^10.4.20",
+    "edgeone": "^1.6.41",
     "eslint": "^8.57.1",
     "eslint-config-next": "^14.2.23",
     "eslint-config-prettier": "^8.10.0",
@@ -87,6 +88,5 @@
     "**/*.{json,css,scss,md,webmanifest}": [
       "prettier -w"
     ]
-  },
-  "packageManager": "pnpm@10.12.4+sha512.5ea8b0deed94ed68691c9bad4c955492705c5eeb8a87ef86bc62c74a26b037b08ff9570f108b2e4dbd1dd1a9186fea925e527f141c648e85af45631074680184"
+  }
 }

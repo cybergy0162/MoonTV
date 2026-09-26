@@ -64,7 +64,7 @@ async function generateAuthCookie(
     authData.timestamp = Date.now(); // 添加时间戳防重放攻击
   }
 
-  return encodeURIComponent(JSON.stringify(authData));
+  return JSON.stringify(authData);
 }
 
 export async function POST(req: NextRequest) {

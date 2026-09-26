@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getConfig } from '@/lib/config';
 import { db } from '@/lib/db';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 
 // 读取存储类型环境变量，默认 localstorage
 const STORAGE_TYPE =
@@ -55,7 +55,7 @@ async function generateAuthCookie(username: string): Promise<string> {
   const signature = await generateSignature(username, signingKey);
   authData.signature = signature;
 
-  return encodeURIComponent(JSON.stringify(authData));
+  return JSON.stringify(authData);
 }
 
 export async function POST(req: NextRequest) {
