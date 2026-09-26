@@ -12,8 +12,6 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const storageType = process.env.NEXT_PUBLIC_STORAGE_TYPE || 'localstorage';
-
   if (!process.env.PASSWORD) {
     // 如果没有设置密码，重定向到警告页面
     const warningUrl = new URL('/warning', request.url);
@@ -27,8 +25,13 @@ export async function middleware(request: NextRequest) {
     return handleAuthFailure(request, pathname);
   }
 
-  // localstorage模式：在middleware中完成验证
-  if (storageType === 'localstorage') {
+  // 这里不依据 NEXT_PUBLIC_STORAGE_TYPE 判断模式，而是看 cookie 形态：
+  //   localStorage 模式登录时 includePassword=true，cookie 里带 password；
+  //   redis / d1 / upstash 模式的 cookie 只有 username + signature，不带 password。
+  // 原因：部分平台（如 EdgeOne）的边缘中间件拿不到 NEXT_PUBLIC_STORAGE_TYPE，
+  // 按环境变量判断会错误回退成 localstorage，导致非 localstorage 模式请求全部 401。
+  if (authInfo.password !== undefined) {
+    // localstorage 模式：cookie 内含密码，直接与 PASSWORD 比对
     if (!authInfo.password || authInfo.password !== process.env.PASSWORD) {
       return handleAuthFailure(request, pathname);
     }
@@ -43,10 +46,17 @@ export async function middleware(request: NextRequest) {
 
   // 验证签名（如果存在）
   if (authInfo.signature) {
+    // 签名密钥优先用独立的 COOKIE_SIGNATURE_KEY。
+    // 原因：部分平台（如 EdgeOne）的 env 链路会把 PASSWORD 末尾的 '#' 当注释截断，
+    // 导致边缘中间件与 Node API route 拿到的密钥不一致（长度差 1），签名永远校验失败。
+    // 站点密码可以继续带 '#'，只要签名密钥本身不含 '#' 等特殊字符。
+    const signingSecret =
+      process.env.COOKIE_SIGNATURE_KEY || process.env.PASSWORD || '';
+
     const isValidSignature = await verifySignature(
       authInfo.username,
       authInfo.signature,
-      process.env.PASSWORD || ''
+      signingSecret
     );
 
     // 签名验证通过即可

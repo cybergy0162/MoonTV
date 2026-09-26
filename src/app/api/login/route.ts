@@ -58,8 +58,11 @@ async function generateAuthCookie(
 
   if (username && process.env.PASSWORD) {
     authData.username = username;
-    // 使用密码作为密钥对用户名进行签名
-    const signature = await generateSignature(username, process.env.PASSWORD);
+    // 签名密钥优先用独立的 COOKIE_SIGNATURE_KEY（不含 '#' 等特殊字符）。
+    // 必须与 src/middleware.ts 里的取值保持一致，否则中间件验签永远失败。
+    const signingSecret =
+      process.env.COOKIE_SIGNATURE_KEY || process.env.PASSWORD || '';
+    const signature = await generateSignature(username, signingSecret);
     authData.signature = signature;
     authData.timestamp = Date.now(); // 添加时间戳防重放攻击
   }
