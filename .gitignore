@@ -44,3 +44,9 @@ sitemap-*.xml
 src/lib/runtime.ts
 public/manifest.json.edgeone/
 bun.lock
+
+# 调试/部署残留
+.playwright-cli/
+.edgeone/
+.env.localstorage.bak
+public/manifest.json
