@@ -33,6 +33,15 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+// 页面可见标题组件
+function SiteTitle({ name }: { name: string }) {
+  return (
+    <h1 className='text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 text-center'>
+      {name}
+    </h1>
+  );
+}
+
 export const viewport: Viewport = {
   themeColor: '#000000',
   viewportFit: 'cover',
@@ -106,6 +115,7 @@ export default async function RootLayout({
       <body
         className={`${inter.className} min-h-screen bg-white text-gray-900 dark:bg-black dark:text-gray-200`}
       >
+        <SiteTitle name={siteName} />
         <ThemeProvider
           attribute='class'
           defaultTheme='system'
